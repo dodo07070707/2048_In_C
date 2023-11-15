@@ -4,8 +4,9 @@
 #include<windows.h>
 #include<string.h>
 #include<stdbool.h>
-#include<time.h>
+#include<time.h> 
 #include<conio.h>
+#pragma comment(lib,"winmm.lib")
 int arr4[4][4];
 int arr5[5][5];
 int checkarr4[4][4];
@@ -19,6 +20,7 @@ char filenames4x4[16][10];
 char filenames5x5[25][10];
 int retry = 0;
 
+
 void gotoxy(int x, int y) {
     COORD Pos = { x,y };
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
@@ -30,6 +32,24 @@ void Nocursor()
     cursorInfo.dwSize = 1; //커서 굵기 (1 ~ 100)
     cursorInfo.bVisible = FALSE; //커서 Visible TRUE(보임) FALSE(숨김)
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+}
+
+void _playSound(TCHAR* name) {
+    TCHAR command[100];
+    wsprintf(command, TEXT("play %s"), name);
+    mciSendString(command, NULL, 0, NULL);
+}
+
+//재생중이던 소리를 멈추기 위한 함수
+void _stopSound(wchar_t* name) {
+
+    wchar_t command[100];
+    wsprintf(command, TEXT("stop %s"), name);
+    mciSendString(command, NULL, 0, NULL);
+}
+
+char* _printRGBColoredString(int r, int g, int b, char* org) {
+    printf("\033[38;2;%d;%d;%dm%s\033[0m", r, g, b, org);
 }
 
 int random16() {
@@ -117,7 +137,7 @@ void DisplayImage(const char* filename, HDC hdc, int x, int y, int width, int he
     MultiByteToWideChar(CP_ACP, 0, filename, -1, wfilename, wfilename_length);
     HBITMAP hBitmap = (HBITMAP)LoadImage(NULL, wfilename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
-    free(wfilename);
+    free(wfilename); // Release allocated memory
 
     if (hBitmap) {
         HDC hdcMem = CreateCompatibleDC(hdc);
@@ -660,10 +680,10 @@ int _checkifdead4x4() {
         if (score4x4 > highscore4x4) highscore4x4 = score4x4;
         score4x4 = 0;
         for (int i = 0; i < 4; i++) {
-            gotoxy(27, 33);
+            gotoxy(27, 32);
             printf("저런!");
             Sleep(500);
-            gotoxy(27, 33);
+            gotoxy(27, 32);
             printf("        ");
             Sleep(500);
         }
@@ -696,10 +716,10 @@ int _checkifdead5x5() {
         if (score5x5 > highscore5x5) highscore5x5 = score5x5;
         score5x5 = 0;
         for (int i = 0; i < 4; i++) {
-            gotoxy(27, 33);
+            gotoxy(35, 40);
             printf("저런!");
             Sleep(500);
-            gotoxy(27, 33);
+            gotoxy(35, 40);
             printf("        ");
             Sleep(500);
         }
@@ -844,7 +864,7 @@ void _printdeadscreen4x4(int n) {
     printf("    88   YD Y88888P    YP    88   YD    YP      VP");
     Sleep(300);
     char inputkey;
-    gotoxy(60, 32);
+    gotoxy(60, 35);
     printf("Press 'y' to retry, 'n' to End : ");
     while (1) {
         inputkey = _getch();
@@ -921,7 +941,7 @@ void _printdeadscreen5x5(int n) {
     printf("    88   YD Y88888P    YP    88   YD    YP      VP");
     Sleep(300);
     char inputkey;
-    gotoxy(60, 32);
+    gotoxy(60, 35);
     printf("Press 'y' to retry, 'n' to End : ");
     while (1) {
         inputkey = _getch();
@@ -939,48 +959,49 @@ void _printdeadscreen5x5(int n) {
 }
 
 void _printdescription4x4() {
+
     gotoxy(0, 30);
-    printf("┌──────────────────────────────────────────────────────────┐\n");
+    _printRGBColoredString(205, 193, 180, "┌──────────────────────────────────────────────────────────┐\n");
     gotoxy(0, 31);
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 32);
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 33);  
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 34);
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 35);
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 36);
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 37);
-    printf("│                                                          │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                          │\n");
     gotoxy(0, 38);
-    printf("└──────────────────────────────────────────────────────────┘\n");
+    _printRGBColoredString(205, 193, 180, "└──────────────────────────────────────────────────────────┘\n");
     gotoxy(10, 34);
     printf("Your Score : %05d | Best Score : %05d", score4x4,highscore4x4);
 }
 
 void _printdescription5x5() {
     gotoxy(0, 38);
-    printf("┌────────────────────────────────────────────────────────────────────────┐\n");
+    _printRGBColoredString(205, 193, 180, "┌────────────────────────────────────────────────────────────────────────┐\n");
     gotoxy(0, 39);
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 40); 
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 41);
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 42);
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 43);
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 44);
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 45); 
-    printf("│                                                                        │\n");
+    _printRGBColoredString(205, 193, 180, "│                                                                        │\n");
     gotoxy(0, 46);
-    printf("└────────────────────────────────────────────────────────────────────────┘\n");
-    gotoxy(10,42);
+    _printRGBColoredString(205, 193, 180, "└────────────────────────────────────────────────────────────────────────┘\n");
+    gotoxy(18,42);
     printf("Your Score : %05d | Best Score : %05d", score5x5, highscore5x5);
 }
 
@@ -1102,6 +1123,7 @@ int main() {
     system("COLOR 0F"); //!배경색, 글자색
     HDC hdc = GetDC(GetConsoleWindow());
     Nocursor();
+    _playSound(L"2048bgm.wav", 0, SND_FILENAME | SND_ASYNC | SND_LOOP);
     while (1) {
         int selected_round;
         selected_round = _printmain();
