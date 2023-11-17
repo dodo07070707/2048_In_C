@@ -19,7 +19,69 @@ int score5x5 = 0;
 char filenames4x4[16][10];
 char filenames5x5[25][10];
 int retry = 0;
+#define SAVE4x4 "save4x4.txt"
+#define SAVE5x5 "save5x5.txt"
+#define SAVEHIGHSCORE "highscore.txt"
 
+void _saveData4x4() { //4x4 게임의 플레이 중 정보 저장
+    FILE* file = fopen(SAVE4x4, "w");
+    fprintf(file, "%d", score4x4);
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            fprintf(file, " %d", arr4[i][j]);
+        }
+    }
+    fprintf(file, "\n");
+    fclose(file);
+}
+
+void _loadData4x4() {//4x4 게임의 플레이 중 정보 불러오기
+    FILE* file = fopen(SAVE4x4, "r");
+    fscanf(file, "%d", &score4x4);
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            fscanf(file, " %d", &arr4[i][j]);
+        }
+    }
+    fclose(file);
+}
+
+void _saveData5x5() {//5x5 게임의 플레이 중 정보 저장
+    FILE* file = fopen(SAVE5x5, "w");
+    fprintf(file, "%d", score5x5);
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            fprintf(file, " %d", arr5[i][j]);
+        }
+    }
+    fprintf(file, "\n");
+    fclose(file);
+}
+
+void _loadData5x5() {//5x5 게임의 플레이 중 정보 불러오기
+    FILE* file = fopen(SAVE5x5, "r");
+    fscanf(file, "%d", &score5x5);
+
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            fscanf(file, " %d", &arr5[i][j]);
+        }
+    }
+    fclose(file);
+}
+
+void _savehighscore() {//최고점수들 저장하기
+    FILE* file = fopen(SAVEHIGHSCORE, "w");
+    fprintf(file, "%d %d", highscore4x4,highscore5x5);
+    fclose(file);
+}
+
+void _loadhighscore() {//최고점수들 불러오기, 게임 시작시 작동
+    FILE* file = fopen(SAVEHIGHSCORE, "r");
+    fscanf(file, "%d %d", &highscore4x4, &highscore5x5);
+    fclose(file);
+}
 
 void gotoxy(int x, int y) { //커서 위치를 옮기는 함수
     COORD Pos = { x,y };
@@ -66,33 +128,44 @@ int random2or4() { // 블록 생성 시 그 블록의 수를 정하는 랜덤 �
 void _printtitle() { // 게임 초기 시작 시 제목을 보여주는 함수
     gotoxy(50, 5);
     printf("_______________      _____   ______   .__         _________  \n");
+    Sleep(150);
     gotoxy(50, 6);
     printf("\\_____  \\   _  \\    /  |  | /  __  \\  |__| ____   \\_   ___ \\ \n");
+    Sleep(150);
     gotoxy(50, 7);
     printf(" /  ____/  /_\\  \\  /   |  |_>      <  |  |/    \\  /    \\  \\/ \n");
+    Sleep(150);
     gotoxy(50, 8);
     printf("/       \\  \\_/   \\/    ^   /   --   \\ |  |   |  \\ \\     \\____\n");
+    Sleep(150);
     gotoxy(50, 9);
     printf("\\_______ \\_____  /\\____   |\\______  / |__|___|  /  \\______  /\n");
+    Sleep(150);
     gotoxy(50, 10);
     printf("        \\/     \\/      |__|       \\/          \\/          \\/ \n");
+    Sleep(150);
     gotoxy(50, 11);
     printf("                                                             \n");
-    Sleep(1000);
+    Sleep(800);
     system("cls");
 }
 
 void _printrules() { // 규칙을 보여주는 함수
     gotoxy(52, 5);
     printf(".______       __    __   __       _______     _______.\n");
+    Sleep(300);
     gotoxy(52, 6);
     printf("|   _  \\     |  |  |  | |  |     |   ____|   /       |\n");
+    Sleep(300);
     gotoxy(52, 7);
     printf("|  |_)  |    |  |  |  | |  |     |  |__     |   (----`\n");
+    Sleep(300);
     gotoxy(52, 8);
     printf("|      /     |  |  |  | |  |     |   __|     \\   \\    \n");
+    Sleep(300);
     gotoxy(52, 9);
     printf("|  |\\  \\----.|  `--'  | |  `----.|  |____.----)   |   \n");
+    Sleep(300);
     gotoxy(52, 10);
     printf("| _| `._____| \\______/  |_______||_______|_______/    \n");
     Sleep(1000);
@@ -269,7 +342,7 @@ int _printmain() { //4x4를 플레이 할지, 5x5를 플레이할지 고르는 �
 }
 
 
-void _resetcheckarr4x4() { //!
+void _resetcheckarr4x4() { //방향키를 눌렀을때 수들이 이동하는지 확인하는 대조군배열을 리셋하는 함수 (4x4용)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             checkarr4[i][j] = 0;
@@ -277,7 +350,7 @@ void _resetcheckarr4x4() { //!
     }
 }
 
-void _resetcheckarr5x5() {
+void _resetcheckarr5x5() {//방향키를 눌렀을때 수들이 이동하는지 확인하는 대조군배열을 리셋하는 함수 (5x5용)
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
             checkarr5[i][j] = 0;
@@ -677,7 +750,7 @@ int _checkifdead4x4() { //게임 오버 (더 이상 움직이지 못하는 상�
     }
     if (check == 16) {
         if (score4x4 > highscore4x4) highscore4x4 = score4x4;
-        score4x4 = 0;
+  
         for (int i = 0; i < 4; i++) {
             gotoxy(27, 32);
             printf("저런!");
@@ -713,7 +786,6 @@ int _checkifdead5x5() { //게임 오버 (더 이상 움직이지 못하는 상�
     }
     if (check == 25) {
         if (score5x5 > highscore5x5) highscore5x5 = score5x5;
-        score5x5 = 0;
         for (int i = 0; i < 4; i++) {
             gotoxy(35, 40);
             printf("저런!");
@@ -1009,6 +1081,8 @@ void _printdescription4x4() { //게임 중, 본인의 점수와 최고 점수를
     _printRGBColoredString(205, 193, 180, "└──────────────────────────────────────────────────────────┘\n");
     gotoxy(10, 34);
     printf("Your Score : %05d | Best Score : %05d", score4x4,highscore4x4);
+    gotoxy(12, 36);
+    printf("Press 'o' to Save, Press 'l' to Load");
 }
 
 void _printdescription5x5() { //게임 중, 본인의 점수와 최고 점수를 보여주는 함수 (5x5 용)
@@ -1032,6 +1106,8 @@ void _printdescription5x5() { //게임 중, 본인의 점수와 최고 점수를
     _printRGBColoredString(205, 193, 180, "└────────────────────────────────────────────────────────────────────────┘\n");
     gotoxy(18,42);
     printf("Your Score : %05d | Best Score : %05d", score5x5, highscore5x5);
+    gotoxy(20, 44);
+    printf("Press 'o' to Save, Press 'l' to Load");
 }
 
 void _printgoodbye() {
@@ -1069,7 +1145,6 @@ void _print5x5() { //게임을 플레이 할 때 출력에 관련된 함수를 �
     _saveimagenames5x5();
     _printdescription5x5();
     _displayimages5x5();
-    //flag
 }
 void _play4x4() { // 게임 플레이 시 전체적인 순서에 따라 동작하며 다른 함수를 호출하는 메인함수 (4x4용)
     system("mode con: cols=61 lines=40");
@@ -1082,6 +1157,7 @@ void _play4x4() { // 게임 플레이 시 전체적인 순서에 따라 동작�
     int startingpos2 = random16();
     int startingnum1 = random2or4();
     int startingnum2 = random2or4();
+    score4x4 = 0;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             arr4[i][j] = 0;
@@ -1093,17 +1169,23 @@ void _play4x4() { // 게임 플레이 시 전체적인 순서에 따라 동작�
     while (1) {
         char inputkey;
         inputkey = _getch();
-        if (inputkey == 'w') {
+        if (inputkey == 'w' || inputkey == 'W') {
             _logicw4x4();
         }
-        else if (inputkey == 'a') {
+        else if (inputkey == 'a' || inputkey == 'A') {
             _logica4x4();
         }
-        else if (inputkey == 's') {
+        else if (inputkey == 's' || inputkey == 'S') {
             _logics4x4();
         }
-        else if (inputkey == 'd') {
+        else if (inputkey == 'd' || inputkey == 'D') {
             _logicd4x4();
+        }
+        else if (inputkey == 'o' || inputkey == 'O') {
+            _saveData4x4();
+        }
+        else if (inputkey == 'l' || inputkey == 'L') {
+            _loadData4x4();
         }
         if (checkifchanged != 0) _logicaddnewnum4x4();
         checkifchanged = 0;
@@ -1111,10 +1193,12 @@ void _play4x4() { // 게임 플레이 시 전체적인 순서에 따라 동작�
         int ischecked = _checkifclear4x4();
         int isdead = _checkifdead4x4();
         if (ischecked == 1) {
+            _savehighscore();
             _printclearscreen4x4(4);
             break;
         }
         if (isdead == 1) {
+            _savehighscore();
             _printdeadscreen4x4(4);
             break;
         }
@@ -1131,6 +1215,7 @@ void _play5x5() {  // 게임 플레이 시 전체적인 순서에 따라 동작�
     int startingpos2 = random16();
     int startingnum1 = random2or4();
     int startingnum2 = random2or4();
+    score5x5 = 0;
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
             arr5[i][j] = 0;
@@ -1142,17 +1227,23 @@ void _play5x5() {  // 게임 플레이 시 전체적인 순서에 따라 동작�
     while (1) {
         char inputkey;
         inputkey = _getch();
-        if (inputkey == 'w') {
+        if (inputkey == 'w' || inputkey == 'W') {
             _logicw5x5();
         }
-        else if (inputkey == 'a') {
+        else if (inputkey == 'a' || inputkey == 'A') {
             _logica5x5();
         }
-        else if (inputkey == 's') {
+        else if (inputkey == 's' || inputkey == 'S') {
             _logics5x5();
         }
-        else if (inputkey == 'd') {
+        else if (inputkey == 'd' || inputkey == 'D') {
             _logicd5x5();
+        }
+        else if (inputkey == 'o' || inputkey == 'O') {
+            _saveData5x5();
+        }
+        else if (inputkey == 'l' || inputkey == 'L') {
+            _loadData5x5();
         }
         if (checkifchanged != 0) _logicaddnewnum5x5();
         checkifchanged = 0;
@@ -1160,10 +1251,12 @@ void _play5x5() {  // 게임 플레이 시 전체적인 순서에 따라 동작�
         int ischecked = _checkifclear5x5();
         int isdead = _checkifdead5x5();
         if (ischecked == 1) {
+            //_savehighscore();
             _printclearscreen5x5(5);
             break;
         }
         if (isdead == 1) {
+            //_savehighscore();
             _printdeadscreen5x5(5);
             break;
         }
@@ -1178,13 +1271,16 @@ int main() { //main함수 (프로세스 이름, 콘솔창 크기, 배경색/글�
     HDC hdc = GetDC(GetConsoleWindow());
     Nocursor();
     _playSound(L"2048bgm.wav", 0, SND_FILENAME | SND_ASYNC | SND_LOOP);
+    _loadhighscore();
+    _printtitle();
+    _printrules();
     while (1) {
         int selected_round;
         selected_round = _printmain();
         if (selected_round == 4) {
             _play4x4();
         }
-        else {
+        else{
             _play5x5();
         }
         if (retry == 0) break;
